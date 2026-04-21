@@ -282,14 +282,21 @@
     }
 
     #termInput {
-      background: transparent;
-      border: none;
+      background: rgba(51, 255, 0, 0.05); /* very faint green background to show it's an input box */
+      border: 1px solid rgba(51, 255, 0, 0.3);
+      border-radius: 4px;
       color: #33ff00;
       font-family: 'JetBrains Mono', Consolas, monospace;
       font-size: 0.9rem;
       flex: 1;
+      padding: 2px 8px;
+      margin-left: 8px;
       outline: none;
       caret-color: #33ff00;
+    }
+    
+    #termInput::placeholder {
+      color: rgba(51, 255, 0, 0.3);
     }
 
     @keyframes fadeIn {
@@ -451,6 +458,7 @@
       input.id = 'termInput';
       input.autocomplete = 'off';
       input.spellcheck = false;
+      input.placeholder = 'type here... (try: opencode)';
 
       input.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {

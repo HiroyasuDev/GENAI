@@ -1,0 +1,16 @@
+# ==============================================================================
+# Example terraform.tfvars — copy and edit before running terraform apply
+# ==============================================================================
+# cp terraform.tfvars.example terraform.tfvars
+
+project_id = "YOUR_GCP_PROJECT_ID"
+
+# Optional overrides (defaults are fine for most demos):
+# region       = "us-central1"
+# zone         = "us-central1-a"
+# machine_type = "e2-standard-4"    # 4 vCPU, 16 GB RAM — good for CPU inference
+# machine_type = "g2-standard-4"    # 4 vCPU + 1x L4 GPU — much faster inference
+# disk_size_gb = 50
+
+# Restrict access to specific IPs (default: open to all)
+# allowed_source_ranges = ["203.0.113.0/24"]

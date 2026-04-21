@@ -2,6 +2,8 @@
 
 > **A turnkey GCP VM startup script that deploys a fully local AI coding assistant — MiniMax-M2.7 + llama.cpp + OpenCode TUI — in a branded tmux workspace. No API keys. No cloud inference. Just code.**
 
+### 🚀 [Launch Live Lab](https://hiroyasudev.github.io/GENAI/)
+
 ---
 
 ## 🎯 What Is This?
@@ -13,6 +15,7 @@ OpenCode AI Lab is a **self-hosted, zero-dependency AI pair-programming environm
 | **[MiniMax-M2.7](https://huggingface.co/unsloth/MiniMax-M2.7-GGUF)** | 2.7B parameter LLM (Q4_K_M quantized) |
 | **[llama.cpp](https://github.com/ggml-org/llama.cpp)** | High-performance C++ inference engine |
 | **[OpenCode](https://opencode.ai)** | Agentic terminal UI for AI-assisted coding |
+| **[ttyd](https://github.com/tsl0922/ttyd)** | Browser-based terminal (zero-install access) |
 | **tmux** | Branded, split-pane workspace orchestration |
 
 No OpenAI. No Anthropic. No API keys. **100% local inference.**
@@ -22,80 +25,106 @@ No OpenAI. No Anthropic. No API keys. **100% local inference.**
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│                 GCP VM (US-Central1)            │
-│                                                 │
-│  ┌──────────────────┐  ┌──────────────────────┐ │
-│  │   PANE 0          │  │   PANE 1              │ │
-│  │                   │  │                       │ │
-│  │  llama-server     │  │  OpenCode TUI         │ │
-│  │  :8080/v1         │──│  OPENAI_API_BASE=     │ │
-│  │                   │  │  localhost:8080/v1     │ │
-│  │  MiniMax-M2.7     │  │                       │ │
-│  │  Q4_K_M (GGUF)    │  │  Agentic Coding       │ │
-│  └──────────────────┘  └──────────────────────┘ │
-│                                                 │
-│  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ │
-│  LAB: OPENCODE │ MINIMAX-M2.7   GCP-US  15:30  │
-│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
-│                    tmux status bar               │
-└─────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│                   GCP VM (e2-standard-4)             │
+│                                                      │
+│  ┌──────────────┐     ┌───────────────────────────┐  │
+│  │ llama-server  │     │  ttyd (web terminal)      │  │
+│  │ :8080/v1      │◄────│  :7681 (public)           │  │
+│  │               │     │                           │  │
+│  │ MiniMax-M2.7  │     │  ┌─────────────────────┐  │  │
+│  │ Q4_K_M (GGUF) │     │  │   OpenCode TUI      │  │  │
+│  └──────────────┘     │  │   (agentic coding)   │  │  │
+│                        │  └─────────────────────┘  │  │
+│                        └───────────────────────────┘  │
+│                                                      │
+│  Browser ──► http://<EXTERNAL_IP>:7681 ──► OpenCode  │
+└──────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start
+## ⚡ One-Click Deploy (Terraform)
 
-### 1. Create a GCP VM
+Spin up the entire lab from scratch in **~5 minutes**.
 
-```bash
-# e2-standard-4 or better recommended
-# Ubuntu 22.04 LTS
-# At least 16GB RAM for comfortable inference
+### Prerequisites
+
+- [Terraform](https://developer.hashicorp.com/terraform/install) installed
+- [gcloud CLI](https://cloud.google.com/sdk/docs/install) authenticated
+- A GCP project with **Compute Engine API** enabled
+
+### Deploy
+
+```powershell
+# Option A: One-liner (PowerShell)
+.\deploy.ps1 -ProjectId "your-gcp-project-id"
+
+# Option B: Manual
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your project ID
+terraform init
+terraform apply
 ```
 
-### 2. Deploy the Lab (one command)
+### What Happens
 
-```bash
-# As VM startup script, or run manually after SSH:
-chmod +x opencode_lab/vm_startup.sh
-./opencode_lab/vm_startup.sh
+1. Terraform creates a **GCP VM** (e2-standard-4, 16 GB RAM, Ubuntu 22.04)
+2. A **static external IP** is reserved
+3. **Firewall rules** open ports 22 (SSH) and 7681 (web terminal)
+4. The **startup script** runs automatically:
+   - Installs system deps + cmake
+   - Installs ttyd (web terminal)
+   - Installs OpenCode
+   - Downloads MiniMax-M2.7 (~1.6 GB)
+   - Builds llama.cpp from source
+   - Starts llama-server + ttyd
+5. Terraform outputs the **public URL**
+
+### Access
+
+```
+http://<EXTERNAL_IP>:7681
 ```
 
-### 3. Install the Stack
+Open in any browser → type `opencode` → start coding with AI.
+
+### Monitor Startup Progress
 
 ```bash
-cd ~/opencode_lab
-./setup_stack.sh
+gcloud compute ssh opencode-lab-vm --zone=us-central1-a -- tail -f /var/log/opencode-lab-startup.log
 ```
 
-This will:
-- Install system dependencies (build-essential, git, curl, tmux)
-- Install Google Cloud SDK
-- Install [OpenCode](https://opencode.ai) agentic TUI
-- Download MiniMax-M2.7-Q4_K_M.gguf (~1.6GB) from HuggingFace
-- Build llama.cpp from source
-
-### 4. Launch
+### Teardown
 
 ```bash
-./start_lab.sh
+cd terraform
+terraform destroy -auto-approve
 ```
-
-This starts a branded tmux session with:
-- **Left pane**: llama-server running inference on port 8080
-- **Right pane**: OpenCode TUI connected to the local endpoint
 
 ---
 
-## 📁 File Structure
+## 📂 Project Structure
 
 ```
-opencode_lab/
-├── vm_startup.sh     # GCP VM startup script (bootstraps everything)
-├── setup_stack.sh    # Full stack installer (deps + model + inference engine)
-├── start_lab.sh      # Launch script (tmux + llama-server + OpenCode)
-└── .tmux.conf        # Branded tmux status bar config
+GENAI/
+├── deploy.ps1                    # One-click deploy (PowerShell)
+├── README.md
+├── docs/
+│   └── index.html                # GitHub Pages landing page
+├── opencode_lab/
+│   ├── vm_startup.sh             # Original VM startup script
+│   ├── setup_stack.sh            # Manual stack installer
+│   ├── start_lab.sh              # Manual launch script
+│   └── .tmux.conf                # tmux config
+└── terraform/
+    ├── main.tf                   # GCP VM + firewall + static IP
+    ├── variables.tf              # Configurable variables
+    ├── outputs.tf                # Lab URL, SSH command, etc.
+    ├── startup.sh                # Automated full-stack installer
+    ├── terraform.tfvars.example  # Example variables
+    └── .gitignore                # Excludes state files
 ```
 
 ---
@@ -104,33 +133,42 @@ opencode_lab/
 
 ### GPU Acceleration
 
-If your VM has a GPU (A100, L4, T4), edit `setup_stack.sh`:
+For faster inference, use a GPU machine type:
 
-```diff
-- make -j
-+ make -j LLAMA_CUDA=1
+```hcl
+# In terraform.tfvars
+machine_type = "g2-standard-4"   # 1x NVIDIA L4 GPU
+```
+
+Then update `startup.sh` to build with CUDA:
+
+```bash
+cmake -B build -DGGML_CUDA=ON
 ```
 
 ### Different Model
 
-Swap the model in `setup_stack.sh`:
+Edit `terraform/startup.sh` to swap the model:
 
 ```bash
-# Example: Use a different GGUF model
-huggingface-cli download <org>/<model> <filename>.gguf --local-dir models
+huggingface-cli download <org>/<model> <filename>.gguf --local-dir $LAB_HOME/models
 ```
 
-Then update the model path in `start_lab.sh`.
+### Restrict Access
 
-### Port Configuration
-
-The inference server defaults to port `8080`. Change in both `start_lab.sh` and the `OPENAI_API_BASE` export.
+```hcl
+# In terraform.tfvars — limit to specific IPs
+allowed_source_ranges = ["203.0.113.0/24", "198.51.100.42/32"]
+```
 
 ---
 
-## 🔒 Security Note
+## 🔒 Security Notes
 
-This lab is designed for **ephemeral, single-user environments** (lab VMs, cloud training sandboxes). The inference server binds to `localhost` only. Do not expose port 8080 to the public internet without authentication.
+- The inference server binds to `localhost` only (not publicly exposed)
+- Only the ttyd web terminal (port 7681) is public
+- Use `allowed_source_ranges` to restrict access by IP
+- For production, add TLS termination and authentication
 
 ---
 
@@ -142,5 +180,5 @@ MIT
 
 ## 🤙 Built With Aloha
 
-Created during a GCP lab session as a proof-of-concept for self-hosted AI coding workflows.
+Created as a proof-of-concept for self-hosted AI coding workflows.
 No cloud APIs were harmed in the making of this lab.

@@ -475,52 +475,34 @@
           if (val.toLowerCase() === 'opencode') {
              termBody.style.padding = '0';
              termBody.innerHTML = `
-               <div style="display:flex; height:100%; width:100%; background:#1e1e2e; color:#cdd6f4; overflow:hidden; font-family:'JetBrains Mono', Consolas, monospace; animation: fadeIn 0.5s;">
-                 <!-- Sidebar -->
-                 <div style="width:220px; background:#181825; border-right:1px solid #313244; padding:15px; display:flex; flex-direction:column;">
-                    <div style="color:#89b4fa; font-weight:bold; font-size:0.8rem; margin-bottom:15px; letter-spacing:1px;">WORKSPACE</div>
-                    <div style="color:#a6adc8; font-size:0.85rem; display:flex; flex-direction:column; gap:8px;">
-                      <span style="cursor:pointer; hover:opacity:0.8;">📁 src/</span>
-                      <span style="cursor:pointer; hover:opacity:0.8; margin-left:15px;">📄 main.py</span>
-                      <span style="cursor:pointer; hover:opacity:0.8; margin-left:15px;">📄 utils.js</span>
-                      <span style="cursor:pointer; color:#f38ba8; display:flex; align-items:center;">
-                        <span style="margin-right:5px;">📄</span> index.html
-                      </span>
-                    </div>
-                 </div>
+               <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; background:#000000; font-family:'JetBrains Mono', Consolas, monospace; animation: fadeIn 0.4s;">
                  
-                 <!-- Main Chat Area -->
-                 <div style="flex:1; display:flex; flex-direction:column; background:#1e1e2e;">
-                    <!-- Top Bar -->
-                    <div style="border-bottom:1px solid #313244; padding:10px 15px; color:#fab387; background:#11111b; font-size:0.85rem; display:flex; justify-content:space-between;">
-                       <span>✨ OpenCode Agent <span style="color:#6c7086;">v1.2.0</span></span>
-                       <span style="color:#a6e3a1;">MiniMax-M2.7 (Q4_K_M) - Active</span>
-                    </div>
-                    
-                    <!-- Chat History -->
-                    <div style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:20px;">
-                       <div style="color:#6c7086; font-size:0.8rem; text-align:center;">[System] Workspace initialized successfully. Indexed 43 files.</div>
-                       
-                       <div style="display:flex; gap:12px; margin-bottom:10px;">
-                         <div style="background:linear-gradient(135deg, #89b4fa, #cba6f7); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; color:#11111b; font-weight:900; font-size:0.75rem; flex-shrink:0;">AI</div>
-                         <div style="background:#313244; padding:12px 16px; border-radius:0 12px 12px 12px; color:#cdd6f4; font-size:0.9rem; line-height:1.5; flex:1; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                           Aloha! I'm your self-hosted AI pair programmer. I have <span style="color:#a6e3a1; font-weight:bold;">100% full context</span> of this repository.<br><br>What are we building or debugging today?
-                         </div>
-                       </div>
-                    </div>
-                    
-                    <!-- Input Area -->
-                    <div style="padding:15px 20px; border-top:1px solid #313244; background:#181825;">
-                       <div style="background:#1e1e2e; border:1px solid #45475a; padding:12px 15px; border-radius:8px; display:flex; align-items:center;">
-                         <span style="color:#cba6f7; margin-right:12px; font-weight:bold;">❯</span>
-                         <span style="color:#a6adc8; opacity:0.5; font-size:0.9rem;">Ask OpenCode to code, fix a bug, or explain...</span>
-                       </div>
-                       <div style="display:flex; justify-content:space-between; margin-top:8px; color:#6c7086; font-size:0.7rem;">
-                         <span>Use <span style="background:#313244; padding:2px 4px; border-radius:3px;">/</span> for commands.</span>
-                         <span>Press Enter to send.</span>
-                       </div>
-                    </div>
+                 <!-- Logo -->
+                 <div style="font-size: 3.5rem; font-weight: bold; letter-spacing: 0.05em; margin-bottom: 2.5rem;">
+                   <span style="color: #6b7280;">open</span><span style="color: #ffffff;">code</span>
                  </div>
+
+                 <!-- Command Box -->
+                 <div style="width: 85%; max-width: 800px; background: #111111; display: flex; flex-direction: column; border-left: 4px solid #3b82f6; padding: 1.5rem;">
+                   
+                   <!-- Fake typing area -->
+                   <div style="color: #d1d5db; font-size: 1.1rem; margin-bottom: 2.5rem; display: flex; align-items: center; line-height: 1.5;">
+                     <span style="opacity: 0.9;">add a new field for signups that validates that they are 18 years old</span><span class="cursor" style="background:#3b82f6; height:1.2rem; width:10px; margin-left:4px;"></span>
+                   </div>
+                   
+                   <!-- Status Row -->
+                   <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.95rem;">
+                     <span style="color: #60a5fa;">Build</span>
+                     <span style="color: #f3f4f6;">MiniMax-M2.7 Local</span>
+                     <span style="color: #4b5563;">OpenCode Zen</span>
+                   </div>
+                 </div>
+
+                 <!-- Footer Help -->
+                 <div style="width: 85%; max-width: 800px; text-align: right; margin-top: 1rem; color: #6b7280; font-size: 0.85rem;">
+                   Tab switch agent &nbsp;&nbsp;&nbsp; ctrl+p commands
+                 </div>
+
                </div>
              `;
              return;

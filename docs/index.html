@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OpenCode AI Lab – Play with it!</title>
+  <style>
+    body {font-family: system-ui, sans-serif; line-height: 1.6; max-width: 800px; margin: 2rem auto; padding: 0 1rem;}
+    h1 {color: #4A90E2;}
+    a {color: #0066CC;}
+    pre {background:#f4f4f4; padding:1rem; overflow:auto;}
+    .badge {margin-top:1rem;}
+  </style>
+</head>
+<body>
+  <h1>OpenCode AI Lab</h1>
+  <p>A self‑hosted AI coding assistant that runs entirely on a single GCP VM. No API keys, no external inference service.</p>
+
+  <h2>Quick start</h2>
+  <pre><code>git clone https://github.com/HiroyasuDev/GENAI.git
+cd GENAI
+chmod +x opencode_lab/vm_startup.sh
+./opencode_lab/vm_startup.sh   # creates the VM startup script
+./opencode_lab/setup_stack.sh  # installs dependencies & model
+./opencode_lab/start_lab.sh    # launches tmux + llama‑server + OpenCode
+</code></pre>
+
+  <p>The VM will be destroyed at <strong>6 PM</strong>, so clone now!</p>
+
+  <div class="badge">
+    <a href="https://github.com/HiroyasuDev/GENAI"><img src="https://img.shields.io/badge/GitHub-Repo-blue?logo=github" alt="GitHub repo"></a>
+  </div>
+</body>
+</html>

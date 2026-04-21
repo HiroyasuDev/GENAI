@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenCode AI Lab</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -478,16 +478,16 @@
                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; background:#000000; font-family:'JetBrains Mono', Consolas, monospace; animation: fadeIn 0.4s;">
                  
                  <!-- Logo -->
-                 <div style="font-size: 3.5rem; font-weight: bold; letter-spacing: 0.05em; margin-bottom: 2.5rem;">
-                   <span style="color: #6b7280;">open</span><span style="color: #ffffff;">code</span>
+                 <div style="font-family: 'Press Start 2P', monospace; font-size: 3.5rem; letter-spacing: -0.05em; margin-bottom: 3.5rem;">
+                   <span style="color: #6b7280;">open</span><span style="color: #e5e7eb;">code</span>
                  </div>
 
                  <!-- Command Box -->
                  <div style="width: 85%; max-width: 800px; background: #111111; display: flex; flex-direction: column; border-left: 4px solid #3b82f6; padding: 1.5rem;">
                    
-                   <!-- Fake typing area -->
-                   <div style="color: #d1d5db; font-size: 1.1rem; margin-bottom: 2.5rem; display: flex; align-items: center; line-height: 1.5;">
-                     <span style="opacity: 0.9;">add a new field for signups that validates that they are 18 years old</span><span class="cursor" style="background:#3b82f6; height:1.2rem; width:10px; margin-left:4px;"></span>
+                   <!-- Actual typing area -->
+                   <div style="margin-bottom: 2.5rem; display: flex; align-items: center;">
+                     <input type="text" id="opencodePrompt" placeholder="Ask opencode to code, fix, or explain..." style="background: transparent; border: none; outline: none; color: #d1d5db; font-size: 1.1rem; width: 100%; font-family: 'JetBrains Mono', Consolas, monospace;" autocomplete="off" spellcheck="false" autofocus>
                    </div>
                    
                    <!-- Status Row -->
@@ -505,6 +505,25 @@
 
                </div>
              `;
+             
+             // Setup internal logic
+             const pInput = document.getElementById('opencodePrompt');
+             setTimeout(() => pInput.focus(), 100);
+             
+             termBody.addEventListener('click', function() {
+                if (document.getElementById('opencodePrompt')) {
+                   document.getElementById('opencodePrompt').focus();
+                }
+             });
+             
+             pInput.addEventListener('keydown', function(evt) {
+                if (evt.key === 'Enter') {
+                   // Simulate processing
+                   pInput.value = 'Processing request... (Demo complete)';
+                   setTimeout(() => { pInput.value = ''; }, 2000);
+                }
+             });
+             
              return;
           } else if (val !== '') {
              const responseLine = document.createElement('div');

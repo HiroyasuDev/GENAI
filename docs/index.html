@@ -256,6 +256,8 @@
       color: #33ff00;
       overflow-y: auto;
       line-height: 1.5;
+      display: flex;
+      flex-direction: column;
     }
 
     .log-line {
@@ -267,6 +269,28 @@
     .log-success { color: #86efac; }
     .log-warn { color: #fde047; }
     .log-cmd { color: #e5e7eb; }
+
+    .input-line {
+      display: flex;
+      align-items: center;
+      color: #e5e7eb;
+      margin-top: 0.5rem;
+    }
+
+    .prompt-text {
+      margin-right: 8px;
+    }
+
+    #termInput {
+      background: transparent;
+      border: none;
+      color: #33ff00;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 0.9rem;
+      flex: 1;
+      outline: none;
+      caret-color: #33ff00;
+    }
 
     @keyframes fadeIn {
       to { opacity: 1; }
@@ -398,8 +422,7 @@
       { text: "  ║  Model:  MiniMax-M2.7 (Q4_K_M)          ║", class: "log-cmd", delay: 100 },
       { text: "  ║  Engine: llama.cpp (local inference)     ║", class: "log-cmd", delay: 100 },
       { text: "  ║  No API keys. No cloud calls. Just code. ║", class: "log-cmd", delay: 100 },
-      { text: "  ╚══════════════════════════════════════════╝\n", class: "log-cmd", delay: 100 },
-      { text: "lab@opencode:~$ <span class='cursor'></span>", class: "log-cmd", delay: 0 }
+      { text: "  ╚══════════════════════════════════════════╝\n", class: "log-cmd", delay: 100 }
     ];
 
     function openTerminal(e) {
@@ -414,16 +437,65 @@
       clearTimeout(simTimeout);
     }
 
+    function createInputLine() {
+      const line = document.createElement('div');
+      line.className = 'input-line log-cmd';
+      line.style.opacity = 1;
+      
+      const promptText = document.createElement('span');
+      promptText.className = 'prompt-text';
+      promptText.textContent = 'lab@opencode:~$';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'termInput';
+      input.autocomplete = 'off';
+      input.spellcheck = false;
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          const val = input.value.trim();
+          
+          // Convert input to a static written line
+          const staticLine = document.createElement('div');
+          staticLine.className = 'log-line log-cmd';
+          staticLine.textContent = 'lab@opencode:~$ ' + val;
+          staticLine.style.opacity = 1;
+          
+          termBody.insertBefore(staticLine, line);
+          input.value = '';
+
+          // Fake response
+          const responseLine = document.createElement('div');
+          responseLine.className = 'log-line log-info';
+          responseLine.style.opacity = 1;
+
+          if (val.toLowerCase() === 'opencode') {
+             responseLine.innerHTML = "[Agent] Initializing agent environment...<br>[Agent] Hello! I am your 100% local AI assistant powered by MiniMax-M2.7. How can I help you code today?";
+          } else if (val !== '') {
+             responseLine.textContent = "bash: " + val + ": command not found";
+          }
+
+          if (val !== '') termBody.insertBefore(responseLine, line);
+          termBody.scrollTop = termBody.scrollHeight;
+        }
+      });
+
+      line.appendChild(promptText);
+      line.appendChild(input);
+      termBody.appendChild(line);
+      input.focus();
+    }
+
     function runSimulation(index) {
-      if (index >= bootSequence.length) return;
+      if (index >= bootSequence.length) {
+        createInputLine();
+        return;
+      }
       
       const entry = bootSequence[index];
       
       simTimeout = setTimeout(() => {
-        // Remove previous cursor if exists
-        const oldCursor = termBody.querySelector('.cursor');
-        if (oldCursor) oldCursor.remove();
-
         const line = document.createElement('div');
         line.className = 'log-line ' + entry.class;
         line.innerHTML = entry.text;

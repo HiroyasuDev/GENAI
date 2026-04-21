@@ -181,6 +181,111 @@
     }
 
     .footer a:hover { text-decoration: underline; }
+
+    /* Terminal Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(15px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .terminal-window {
+      width: 90%;
+      max-width: 1000px;
+      height: 70vh;
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(99, 102, 241, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-overlay.active .terminal-window {
+      transform: translateY(0) scale(1);
+    }
+
+    .terminal-header {
+      background: #1a1a2e;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .terminal-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .term-btn {
+      width: 12px; height: 12px; border-radius: 50%;
+      cursor: pointer;
+    }
+    .term-btn.close { background: #ff5f56; }
+    .term-btn.min { background: #ffbd2e; }
+    .term-btn.max { background: #27c93f; }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.8rem;
+      font-family: 'Inter', sans-serif;
+      color: #8b949e;
+      letter-spacing: 0.5px;
+    }
+
+    .terminal-body {
+      flex: 1;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 0.9rem;
+      color: #33ff00;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    .log-line {
+      margin-bottom: 0.3rem;
+      opacity: 0;
+      animation: fadeIn 0.1s forwards;
+    }
+    .log-info { color: #a5b4fc; }
+    .log-success { color: #86efac; }
+    .log-warn { color: #fde047; }
+    .log-cmd { color: #e5e7eb; }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: #33ff00;
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -195,9 +300,9 @@
       No API keys. No cloud inference. 100% local LLM. Just open your browser.
     </p>
 
-    <a class="launch-btn" href="http://136.114.142.241:7681" target="_blank" rel="noopener">
+    <a class="launch-btn" href="#" onclick="openTerminal(event)">
       <span class="launch-icon">🚀</span>
-      Launch Lab Terminal
+      Launch Lab Terminal (Demo)
     </a>
 
     <div class="stack">
@@ -228,6 +333,22 @@
     Built with aloha&nbsp;·&nbsp;<a href="https://github.com/HiroyasuDev/GENAI">View Source on GitHub</a>
   </div>
 
+  <div class="modal-overlay" id="termModal">
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <div class="terminal-buttons">
+          <div class="term-btn close" onclick="closeTerminal()"></div>
+          <div class="term-btn min"></div>
+          <div class="term-btn max"></div>
+        </div>
+        <div class="terminal-title">lab@opencode: ~</div>
+      </div>
+      <div class="terminal-body" id="termBody">
+        <!-- Logs injected by JS -->
+      </div>
+    </div>
+  </div>
+
   <script>
     // Countdown to 6 PM HST (UTC-10) tomorrow
     function updateCountdown() {
@@ -254,6 +375,65 @@
 
     updateCountdown();
     setInterval(updateCountdown, 1000);
+
+    // Terminal Simulator Logic
+    const termBody = document.getElementById('termBody');
+    const termModal = document.getElementById('termModal');
+    let simTimeout;
+
+    const bootSequence = [
+      { text: "Initializing OpenCode AI Lab Environment...", class: "log-info", delay: 300 },
+      { text: "Loading OS layout: Ubuntu 22.04 LTS...", class: "log-cmd", delay: 400 },
+      { text: "[OK] Started ttyd web terminal server on port 7681", class: "log-success", delay: 500 },
+      { text: "Mounting MiniMax-M2.7 (Q4_K_M.gguf) into memory...", class: "log-info", delay: 800 },
+      { text: "llama_model_load: loading model from 'models/MiniMax-M2.7-Q4_K_M.gguf'", class: "log-warn", delay: 600 },
+      { text: "llama_model_load: 64 tensors, 2.70B parameters, compute capacity 8.0, 1.62 GiB", class: "log-warn", delay: 300 },
+      { text: "[OK] Llama-server listening on 127.0.0.1:8080", class: "log-success", delay: 500 },
+      { text: "Booting OpenCode Agentic TUI...", class: "log-info", delay: 700 },
+      { text: "\n  ╔══════════════════════════════════════════╗", class: "log-cmd", delay: 100 },
+      { text: "  ║       🧠 OpenCode AI Lab                 ║", class: "log-cmd", delay: 100 },
+      { text: "  ║                                          ║", class: "log-cmd", delay: 100 },
+      { text: "  ║  Type: opencode    to start coding       ║", class: "log-cmd", delay: 100 },
+      { text: "  ║                                          ║", class: "log-cmd", delay: 100 },
+      { text: "  ║  Model:  MiniMax-M2.7 (Q4_K_M)          ║", class: "log-cmd", delay: 100 },
+      { text: "  ║  Engine: llama.cpp (local inference)     ║", class: "log-cmd", delay: 100 },
+      { text: "  ║  No API keys. No cloud calls. Just code. ║", class: "log-cmd", delay: 100 },
+      { text: "  ╚══════════════════════════════════════════╝\n", class: "log-cmd", delay: 100 },
+      { text: "lab@opencode:~$ <span class='cursor'></span>", class: "log-cmd", delay: 0 }
+    ];
+
+    function openTerminal(e) {
+      e.preventDefault();
+      termModal.classList.add('active');
+      termBody.innerHTML = '';
+      runSimulation(0);
+    }
+
+    function closeTerminal() {
+      termModal.classList.remove('active');
+      clearTimeout(simTimeout);
+    }
+
+    function runSimulation(index) {
+      if (index >= bootSequence.length) return;
+      
+      const entry = bootSequence[index];
+      
+      simTimeout = setTimeout(() => {
+        // Remove previous cursor if exists
+        const oldCursor = termBody.querySelector('.cursor');
+        if (oldCursor) oldCursor.remove();
+
+        const line = document.createElement('div');
+        line.className = 'log-line ' + entry.class;
+        line.innerHTML = entry.text;
+        termBody.appendChild(line);
+        
+        termBody.scrollTop = termBody.scrollHeight;
+        
+        runSimulation(index + 1);
+      }, entry.delay);
+    }
   </script>
 
 </body>

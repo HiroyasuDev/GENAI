@@ -484,7 +484,16 @@
       line.appendChild(promptText);
       line.appendChild(input);
       termBody.appendChild(line);
-      input.focus();
+      
+      // Ensure the input gets focus whenever the user clicks in the terminal area
+      termBody.addEventListener('click', function() {
+        if (document.getElementById('termInput')) {
+          document.getElementById('termInput').focus();
+        }
+      });
+      
+      // Force focus via setTimeout to ensure it is painted
+      setTimeout(() => input.focus(), 100);
     }
 
     function runSimulation(index) {

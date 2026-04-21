@@ -486,8 +486,8 @@
                  <div style="width: 85%; max-width: 800px; background: #111111; display: flex; flex-direction: column; border-left: 4px solid #3b82f6; padding: 1.5rem;">
                    
                    <!-- Actual typing area -->
-                   <div style="margin-bottom: 2.5rem; display: flex; align-items: center;">
-                     <input type="text" id="opencodePrompt" placeholder="Ask opencode to code, fix, or explain..." style="background: transparent; border: none; outline: none; color: #d1d5db; font-size: 1.1rem; width: 100%; font-family: 'JetBrains Mono', Consolas, monospace;" autocomplete="off" spellcheck="false" autofocus>
+                   <div style="margin-bottom: 2.5rem; display: flex; align-items: center; width: 100%; position: relative; z-index: 10;">
+                     <input type="text" id="opencodePrompt" placeholder="Ask opencode to code, fix, or explain..." style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 10px 15px; outline: none; color: #ffffff; font-size: 1.1rem; width: 100%; height: 50px; font-family: 'JetBrains Mono', Consolas, monospace; cursor: text;" autocomplete="off" spellcheck="false" autofocus>
                    </div>
                    
                    <!-- Status Row -->

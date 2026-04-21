@@ -229,13 +229,12 @@
   </div>
 
   <script>
-    // Countdown to 6 PM HST (UTC-10) today
+    // Countdown to 6 PM HST (UTC-10) tomorrow
     function updateCountdown() {
-      // Target: 6:00 PM HST = 04:00 UTC next day (April 21)
-      // The VM dies at 6 PM HST on April 20, 2026
+      // The VM dies at 6 PM HST on April 21, 2026
       const now = new Date();
       // 6 PM HST = 6 PM UTC-10 = 04:00 UTC (next day)
-      const target = new Date('2026-04-21T04:00:00Z');
+      const target = new Date('2026-04-22T04:00:00Z');
       const diff = target - now;
 
       if (diff <= 0) {

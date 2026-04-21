@@ -517,10 +517,58 @@
              });
              
              pInput.addEventListener('keydown', function(evt) {
-                if (evt.key === 'Enter') {
-                   // Simulate processing
-                   pInput.value = 'Processing request... (Demo complete)';
-                   setTimeout(() => { pInput.value = ''; }, 2000);
+                if (evt.key === 'Enter' && pInput.value.trim() !== '') {
+                   const userPrompt = pInput.value.trim();
+                   pInput.disabled = true;
+                   
+                   // Create streaming response box
+                   const wrapper = document.createElement('div');
+                   wrapper.style = "width: 85%; max-width: 800px; background: #1e1e2e; border: 1px solid #45475a; border-radius: 8px; margin-top: 1.5rem; padding: 1.5rem; color: #a6adc8; display: flex; flex-direction: column; text-align: left;";
+                   
+                   const header = document.createElement('div');
+                   header.innerHTML = "<span style='color: #a6e3a1; font-weight: bold;'>MiniMax-M2.7</span> <span style='font-size: 0.8rem; color: #6c7086;'>Generating...</span>";
+                   header.style.marginBottom = "1rem";
+                   wrapper.appendChild(header);
+                   
+                   const content = document.createElement('div');
+                   content.style.lineHeight = "1.6";
+                   wrapper.appendChild(content);
+                   
+                   // Append below the footer help
+                   pInput.parentElement.parentElement.parentElement.appendChild(wrapper);
+                   
+                   const mockResponse = "I've analyzed your request: \\"" + userPrompt + "\\".\\n\\nHere is the implementation:\\n\\n```python\\ndef execute_task():\\n    # Connecting to local workspace...\\n    print('Executing task...')\\n    return {'status': 'success', 'model': 'MiniMax-M2.7'}\\n\\nif __name__ == '__main__':\\n    execute_task()\\n```\\n\\nLet me know if you want me to commit these changes.";
+                   
+                   let charIndex = 0;
+                   function streamText() {
+                       if (charIndex < mockResponse.length) {
+                           let char = mockResponse.charAt(charIndex);
+                           if (char === '\\n') {
+                               content.innerHTML += "<br>";
+                           } else if (char === '<') {
+                               content.innerHTML += "&lt;";
+                           } else if (char === '>') {
+                               content.innerHTML += "&gt;";
+                           } else {
+                               content.innerHTML += char;
+                           }
+                           charIndex++;
+                           
+                           // Scroll down naturally
+                           termBody.scrollTop = termBody.scrollHeight;
+                           
+                           // Randomize typing speed for realism
+                           let delay = Math.random() * 30 + 10;
+                           setTimeout(streamText, delay);
+                       } else {
+                           header.innerHTML = "<span style='color: #a6e3a1; font-weight: bold;'>MiniMax-M2.7</span> <span style='font-size: 0.8rem; color: #6c7086;'>Done</span>";
+                           pInput.disabled = false;
+                           pInput.value = '';
+                           pInput.focus();
+                       }
+                   }
+                   
+                   streamText();
                 }
              });
              

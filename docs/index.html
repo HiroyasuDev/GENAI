@@ -2,32 +2,260 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>OpenCode AI Lab – Play with it!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenCode AI Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {font-family: system-ui, sans-serif; line-height: 1.6; max-width: 800px; margin: 2rem auto; padding: 0 1rem;}
-    h1 {color: #4A90E2;}
-    a {color: #0066CC;}
-    pre {background:#f4f4f4; padding:1rem; overflow:auto;}
-    .badge {margin-top:1rem;}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 30% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+      animation: drift 20s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes drift {
+      0%   { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(-3%, 3%) rotate(2deg); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      max-width: 700px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 3rem;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: #9ca3af;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+
+    .launch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      padding: 1rem 2.5rem;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.3),
+                  0 4px 15px rgba(0, 0, 0, 0.3);
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+
+    .launch-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 0 50px rgba(99, 102, 241, 0.5),
+                  0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.3), 0 4px 15px rgba(0,0,0,0.3); }
+      50%      { box-shadow: 0 0 45px rgba(99, 102, 241, 0.5), 0 4px 20px rgba(0,0,0,0.3); }
+    }
+
+    .launch-icon {
+      font-size: 1.5rem;
+    }
+
+    /* Stack info cards */
+    .stack {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 3rem;
+    }
+
+    .stack-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      min-width: 140px;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.3s;
+    }
+
+    .stack-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .stack-card .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 0.35rem;
+    }
+
+    .stack-card .value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #c4b5fd;
+    }
+
+    /* Timer */
+    .timer {
+      margin-top: 2.5rem;
+      font-size: 0.85rem;
+      color: #ef4444;
+      font-weight: 600;
+    }
+
+    .timer span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
+      color: #fca5a5;
+    }
+
+    /* Footer */
+    .footer {
+      position: fixed;
+      bottom: 1.5rem;
+      font-size: 0.75rem;
+      color: #4b5563;
+    }
+
+    .footer a {
+      color: #6366f1;
+      text-decoration: none;
+    }
+
+    .footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <h1>OpenCode AI Lab</h1>
-  <p>A self‑hosted AI coding assistant that runs entirely on a single GCP VM. No API keys, no external inference service.</p>
 
-  <h2>Quick start</h2>
-  <pre><code>git clone https://github.com/HiroyasuDev/GENAI.git
-cd GENAI
-chmod +x opencode_lab/vm_startup.sh
-./opencode_lab/vm_startup.sh   # creates the VM startup script
-./opencode_lab/setup_stack.sh  # installs dependencies & model
-./opencode_lab/start_lab.sh    # launches tmux + llama‑server + OpenCode
-</code></pre>
+  <div class="container">
+    <div class="badge">🔬 Live Lab Environment</div>
 
-  <p>The VM will be destroyed at <strong>6 PM</strong>, so clone now!</p>
+    <h1>OpenCode AI Lab</h1>
 
-  <div class="badge">
-    <a href="https://github.com/HiroyasuDev/GENAI"><img src="https://img.shields.io/badge/GitHub-Repo-blue?logo=github" alt="GitHub repo"></a>
+    <p class="subtitle">
+      A fully self‑hosted AI coding assistant running on a GCP VM.<br>
+      No API keys. No cloud inference. 100% local LLM. Just open your browser.
+    </p>
+
+    <a class="launch-btn" href="http://136.114.142.241:7681" target="_blank" rel="noopener">
+      <span class="launch-icon">🚀</span>
+      Launch Lab Terminal
+    </a>
+
+    <div class="stack">
+      <div class="stack-card">
+        <div class="label">Model</div>
+        <div class="value">MiniMax‑M2.7</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Engine</div>
+        <div class="value">llama.cpp</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Interface</div>
+        <div class="value">OpenCode TUI</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Region</div>
+        <div class="value">US‑Central1</div>
+      </div>
+    </div>
+
+    <div class="timer">
+      ⏳ This lab self‑destructs in <span id="countdown">--:--:--</span>
+    </div>
   </div>
+
+  <div class="footer">
+    Built with aloha&nbsp;·&nbsp;<a href="https://github.com/HiroyasuDev/GENAI">View Source on GitHub</a>
+  </div>
+
+  <script>
+    // Countdown to 6 PM HST (UTC-10) today
+    function updateCountdown() {
+      // Target: 6:00 PM HST = 04:00 UTC next day (April 21)
+      // The VM dies at 6 PM HST on April 20, 2026
+      const now = new Date();
+      // 6 PM HST = 6 PM UTC-10 = 04:00 UTC (next day)
+      const target = new Date('2026-04-21T04:00:00Z');
+      const diff = target - now;
+
+      if (diff <= 0) {
+        document.getElementById('countdown').textContent = 'EXPIRED';
+        return;
+      }
+
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+
+      document.getElementById('countdown').textContent =
+        String(h).padStart(2, '0') + ':' +
+        String(m).padStart(2, '0') + ':' +
+        String(s).padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+
 </body>
 </html>
